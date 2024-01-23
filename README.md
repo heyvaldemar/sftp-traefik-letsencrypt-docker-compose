@@ -16,6 +16,22 @@ Deploy SFTP using Docker Compose:
 
 `docker compose -f sftp-traefik-letsencrypt-docker-compose.yml -p sftp up -d`
 
+Change the ownership of the `user1` directory.
+
+Replace `1001` with the UID for `user1` as specified in your `.env` file.
+
+In this setup, we are using UID `1001` for `user1`.
+
+`sudo chown -R 1001:1001 /srv/sftpusers/user1`
+
+Change the ownership of the `user2` directory.
+
+Replace `1002` with the UID for `user2` as specified in your `.env` file.
+
+In this setup, we are using UID `1002` for `user2`.
+
+`sudo chown -R 1002:1002 /srv/sftpusers/user2`
+
 You can connect to your SFTP server using hostname, port, username and password previously set in the `.env`.
 
 # Author
@@ -27,7 +43,7 @@ I’m Vladimir Mikhalev, the [Docker Captain](https://www.docker.com/captains/vl
 🐦 Follow me on [Twitter](https://twitter.com/heyValdemar)\
 🎨 Follow me on [Instagram](https://www.instagram.com/heyvaldemar/)\
 🧵 Follow me on [Threads](https://www.threads.net/@heyvaldemar)\
-🐘 Follow me on [Mastodon](https://hachyderm.io/@heyValdemar)\
+🐘 Follow me on [Mastodon](https://mastodon.social/@heyvaldemar)\
 🧊 Follow me on [Bluesky](https://bsky.app/profile/heyvaldemar.bsky.social)\
 🎸 Follow me on [Facebook](https://www.facebook.com/heyValdemarFB/)\
 🎥 Follow me on [TikTok](https://www.tiktok.com/@heyvaldemar)\

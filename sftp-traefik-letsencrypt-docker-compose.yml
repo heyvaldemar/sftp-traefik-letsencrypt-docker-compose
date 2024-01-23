@@ -67,8 +67,8 @@ services:
       ${SFTP_USER_1}:${SFTP_USER_1_PASSWORD}:${SFTP_USER_1_UID}::
       ${SFTP_USER_2}:${SFTP_USER_2_PASSWORD}:${SFTP_USER_2_UID}::
     volumes:
-      - /srv/sftpusers/user1:/home/${SFTP_USER_1}
-      - /srv/sftpusers/user2:/home/${SFTP_USER_2}
+      - /srv/sftpusers/user1:/home/${SFTP_USER_1}/data
+      - /srv/sftpusers/user2:/home/${SFTP_USER_2}/data
     environment:
       SFTP_USER_1_UID: ${SFTP_USER_1_UID}
       SFTP_USER_2_UID: ${SFTP_USER_2_UID}

@@ -69,9 +69,6 @@ services:
     volumes:
       - /srv/sftpusers/user1:/home/${SFTP_USER_1}/data
       - /srv/sftpusers/user2:/home/${SFTP_USER_2}/data
-    environment:
-      SFTP_USER_1_UID: ${SFTP_USER_1_UID}
-      SFTP_USER_2_UID: ${SFTP_USER_2_UID}
     networks:
       - sftp-network
       - traefik-network

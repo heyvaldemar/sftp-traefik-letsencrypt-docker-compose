@@ -1,4 +1,4 @@
-name: Deployment Verification for SFTP
+name: Deployment Verification
 
 on:
   push:
@@ -36,11 +36,9 @@ jobs:
         run: docker ps
 
       - name: Wait for the SFTP service to be ready
-        env:
-          SFTP_USER_1_PASSWORD: ${{ secrets.SFTP_USER_1_PASSWORD }}
         run: |
           echo "Checking the routing and availability of application via Traefik..."
-          timeout 5m bash -c 'while ! echo "exit" | sftp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=10 -P 2222 user1:${{ env.SFTP_USER_1_PASSWORD }}@sftp.heyvaldemar.net; do echo "Waiting for the application to be ready..."; sleep 10; done'
+          timeout 5m bash -c 'while ! nc -z sftp.heyvaldemar.net 2222; do echo "Waiting for the application to be ready..."; sleep 10; done'
 
       - name: Inspect Network Configuration
         run: |

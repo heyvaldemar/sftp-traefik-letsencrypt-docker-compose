@@ -50,7 +50,7 @@ services:
       - "--entrypoints.web.address=:80"
       # Define the secure (HTTPS) entry point on port 443
       - "--entrypoints.websecure.address=:443"
-      # Define the SFTP entry point on port specified by the SFTP_PORT variable
+      # Define the SFTP entry point using an environment variable for the port
       - "--entryPoints.ssh.address=:${SFTP_PORT}"
       # Enable the Docker provider to detect containers and their labels
       - "--providers.docker=true"

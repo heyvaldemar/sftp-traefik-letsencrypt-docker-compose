@@ -1,121 +1,82 @@
-# SFTP with Let's Encrypt Using Docker Compose
+# SFTP + Traefik + Let's Encrypt — Docker Compose
 
-[![Deployment Verification](https://github.com/heyvaldemar/sftp-traefik-letsencrypt-docker-compose/actions/workflows/00-deployment-verification.yml/badge.svg)](https://github.com/heyvaldemar/sftp-traefik-letsencrypt-docker-compose/actions)
+[![Deployment Verification](https://github.com/heyvaldemar/sftp-traefik-letsencrypt-docker-compose/actions/workflows/deployment-verification.yml/badge.svg?branch=main)](https://github.com/heyvaldemar/sftp-traefik-letsencrypt-docker-compose/actions/workflows/deployment-verification.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-The badge displayed on my repository indicates the status of the deployment verification workflow as executed on the latest commit to the main branch.
+This repository deploys an **SFTP server** ([atmoz/sftp](https://github.com/atmoz/sftp)) behind **Traefik's TCP router**, with the Traefik dashboard on HTTPS via **Let's Encrypt**. Two chrooted accounts are provisioned from `.env`; their data lands on the host under `/srv/sftpusers/<user>`.
 
-**Passing**: This means the most recent commit has successfully passed all deployment checks, confirming that the Docker Compose setup functions correctly as designed.
+## Getting started
 
-📙 The complete installation guide is available on my [website](https://www.heyvaldemar.com/install-sftp-using-docker-compose/).
+```bash
+# 1. Clone
+git clone https://github.com/heyvaldemar/sftp-traefik-letsencrypt-docker-compose
+cd sftp-traefik-letsencrypt-docker-compose
 
-❗ Change variables in the `.env` to meet your requirements.
+# 2. Create the two Docker networks the stack expects
+docker network create traefik-network
+docker network create sftp-network
 
-💡 Note that the `.env` file should be in the same directory as `sftp-traefik-letsencrypt-docker-compose.yml`.
+# 3. Create the host data directories
+sudo mkdir -p /srv/sftpusers/user1 /srv/sftpusers/user2
 
-Create networks for your services before deploying the configuration using the commands:
+# 4. Copy the environment template and fill in required values
+cp .env.example .env
+$EDITOR .env
 
-`docker network create traefik-network`
+# 5. Deploy
+docker compose -f sftp-traefik-letsencrypt-docker-compose.yml -p sftp up -d
+```
 
-`docker network create sftp-network`
+Connect with any SFTP client:
 
-Deploy SFTP using Docker Compose:
+```bash
+sftp -P 2222 user1@sftp.example.com
+```
 
-`docker compose -f sftp-traefik-letsencrypt-docker-compose.yml -p sftp up -d`
+### What success looks like
 
-Change the ownership of the `user1` directory.
+```bash
+docker compose -f sftp-traefik-letsencrypt-docker-compose.yml -p sftp ps
+sftp -P 2222 user1@YOUR_SERVER   # prompts for the password from .env
+```
 
-Replace `1001` with the UID for `user1` as specified in your `.env` file.
+### Common first-deploy issues
 
-In this setup, we are using UID `1001` for `user1`.
+- **Connection refused.** The `SFTP_PORT` (default 2222) must be open in your firewall; Traefik publishes it directly.
+- **Login works but uploads fail.** Upload into the `data` subdirectory — the chroot home itself is read-only by design (atmoz/sftp requirement).
+- **Networks not found.** Step 2 was skipped.
 
-`sudo chown -R 1001:1001 /srv/sftpusers/user1`
+## Supply chain trust
 
-Change the ownership of the `user2` directory.
+Two images — [`traefik`](https://hub.docker.com/_/traefik) and [`atmoz/sftp`](https://hub.docker.com/r/atmoz/sftp) — pinned by digest as interpolation defaults in the compose `x-images` block (atmoz/sftp publishes no semver tags, so the `debian` tag is pinned to an exact digest). `git pull` alone delivers the tested combination.
 
-Replace `1002` with the UID for `user2` as specified in your `.env` file.
+The weekly `check-pin-freshness` CI job re-resolves each pin against its registry; GitHub Actions are pinned by commit SHA and Dependabot keeps those fresh.
 
-In this setup, we are using UID `1002` for `user2`.
+## Production checklist
 
-`sudo chown -R 1002:1002 /srv/sftpusers/user2`
+- [ ] **Strong passwords** — 24+ random characters per account; regenerate the Traefik dashboard hash.
+- [ ] **Prefer SSH keys** for real workloads — atmoz/sftp supports mounting public keys per user; password auth is the lowest bar.
+- [ ] **Back up `/srv/sftpusers/`** — that's where all uploaded data lives.
+- [ ] **Watch the upstream image** — atmoz/sftp moves slowly; the weekly digest check tells you when a rebuild lands.
 
-You can connect to your SFTP server using hostname, port, username and password previously set in the `.env`.
+## Testing
 
-## Author
+The [Deployment Verification](https://github.com/heyvaldemar/sftp-traefik-letsencrypt-docker-compose/actions/workflows/deployment-verification.yml?query=branch%3Amain) workflow runs on every push, pull request, and every Monday at 06:00 UTC: actionlint, Trivy scans of both pinned images, the weekly digest check, and a deploy-and-test job that performs a real SFTP login and directory listing through Traefik's TCP router with an ephemeral password.
 
-hey everyone,
+## Security Notes
 
-💾 I’ve been in the IT game for over 20 years, cutting my teeth with some big names like [IBM](https://www.linkedin.com/in/heyvaldemar/), [Thales](https://www.linkedin.com/in/heyvaldemar/), and [Amazon](https://www.linkedin.com/in/heyvaldemar/). These days, I wear the hat of a DevOps Consultant and Team Lead, but what really gets me going is Docker and container technology - I’m kind of obsessed!
+- Credentials are read from `.env` at deploy time; `.env` is gitignored and compose fails fast on missing required variables.
+- **Pre-rotation advisory.** Releases before v1.0.0 (2026-09-01) shipped a tracked `.env` with generated-looking account passwords. Rotate them if your deployment reused them.
+- Each account is chrooted to its own home; users cannot see each other's data.
 
-💛 I have my own IT [blog](https://www.heyvaldemar.com/), where I’ve built a [community](https://discord.gg/AJQGCCBcqf) of DevOps enthusiasts who share my love for all things Docker, containers, and IT technologies in general. And to make sure everyone can jump on this awesome DevOps train, I write super detailed guides (seriously, they’re foolproof!) that help even newbies deploy and manage complex IT solutions.
+---
 
-🚀 My dream is to empower every single person in the DevOps community to squeeze every last drop of potential out of Docker and container tech.
-
-🐳 As a [Docker Captain](https://www.docker.com/captains/vladimir-mikhalev/), I’m stoked to share my knowledge, experiences, and a good dose of passion for the tech. My aim is to encourage learning, innovation, and growth, and to inspire the next generation of IT whizz-kids to push Docker and container tech to its limits.
-
-Let’s do this together!
-
-## My 2D Portfolio
-
-🕹️ Click into [sre.gg](https://www.sre.gg/) — my virtual space is a 2D pixel-art portfolio inviting you to interact with elements that encapsulate the milestones of my DevOps career.
-
-## My Courses
-
-🎓 Dive into my [comprehensive IT courses](https://www.heyvaldemar.com/courses/) designed for enthusiasts and professionals alike. Whether you're looking to master Docker, conquer Kubernetes, or advance your DevOps skills, my courses provide a structured pathway to enhancing your technical prowess.
-
-🔑 [Each course](https://www.udemy.com/user/heyvaldemar/) is built from the ground up with real-world scenarios in mind, ensuring that you gain practical knowledge and hands-on experience. From beginners to seasoned professionals, there's something here for everyone to elevate their IT skills.
-
-## My Services
-
-💼 Take a look at my [service catalog](https://www.heyvaldemar.com/services/) and find out how we can make your technological life better. Whether it's increasing the efficiency of your IT infrastructure, advancing your career, or expanding your technological horizons — I'm here to help you achieve your goals. From DevOps transformations to building gaming computers — let's make your technology unparalleled!
-
-## Patreon Exclusives
-
-🏆 Join my [Patreon](https://www.patreon.com/heyvaldemar) and dive deep into the world of Docker and DevOps with exclusive content tailored for IT enthusiasts and professionals. As your experienced guide, I offer a range of membership tiers designed to suit everyone from newbies to IT experts.
-
-## My Recommendations
-
-📕 Check out my collection of [essential DevOps books](https://kit.co/heyvaldemar/essential-devops-books)\
-🖥️ Check out my [studio streaming and recording kit](https://kit.co/heyvaldemar/my-studio-streaming-and-recording-kit)\
-📡 Check out my [streaming starter kit](https://kit.co/heyvaldemar/streaming-starter-kit)
-
-## Follow Me
-
-🎬 [YouTube](https://www.youtube.com/channel/UCf85kQ0u1sYTTTyKVpxrlyQ?sub_confirmation=1)\
-🐦 [X / Twitter](https://twitter.com/heyvaldemar)\
-🎨 [Instagram](https://www.instagram.com/heyvaldemar/)\
-🐘 [Mastodon](https://mastodon.social/@heyvaldemar)\
-🧵 [Threads](https://www.threads.net/@heyvaldemar)\
-🎸 [Facebook](https://www.facebook.com/heyvaldemarFB/)\
-🧊 [Bluesky](https://bsky.app/profile/heyvaldemar.bsky.social)\
-🎥 [TikTok](https://www.tiktok.com/@heyvaldemar)\
-💻 [LinkedIn](https://www.linkedin.com/in/heyvaldemar/)\
-📣 [daily.dev Squad](https://app.daily.dev/squads/devopscompass)\
-🧩 [LeetCode](https://leetcode.com/u/heyvaldemar/)\
-🐈 [GitHub](https://github.com/heyvaldemar)
-
-## Community of IT Experts
-
-👾 [Discord](https://discord.gg/AJQGCCBcqf)
-
-## Refill My Coffee Supplies
-
-💖 [PayPal](https://www.paypal.com/paypalme/heyvaldemarCOM)\
-🏆 [Patreon](https://www.patreon.com/heyvaldemar)\
-💎 [GitHub](https://github.com/sponsors/heyvaldemar)\
-🥤 [BuyMeaCoffee](https://www.buymeacoffee.com/heyvaldemar)\
-🍪 [Ko-fi](https://ko-fi.com/heyvaldemar)
-
-🌟 **Bitcoin (BTC):** bc1q2fq0k2lvdythdrj4ep20metjwnjuf7wccpckxc\
-🔹 **Ethereum (ETH):** 0x76C936F9366Fad39769CA5285b0Af1d975adacB8\
-🪙 **Binance Coin (BNB):** bnb1xnn6gg63lr2dgufngfr0lkq39kz8qltjt2v2g6\
-💠 **Litecoin (LTC):** LMGrhx8Jsx73h1pWY9FE8GB46nBytjvz8g
+## About the maintainer
 
 <div align="center">
 
-### Show some 💜 by starring some of the [repositories](https://github.com/heyValdemar?tab=repositories)!
+**Maintained by [Vladimir Mikhalev](https://github.com/heyvaldemar)** — Docker Captain · IBM Champion · AWS Community Builder
 
-![octocat](https://user-images.githubusercontent.com/10498744/210113490-e2fad07f-4488-4da8-a656-b9abbdd8cb26.gif)
+[YouTube](https://www.youtube.com/channel/UCf85kQ0u1sYTTTyKVpxrlyQ?sub_confirmation=1) · [Blog](https://heyvaldemar.com) · [LinkedIn](https://www.linkedin.com/in/heyvaldemar/)
 
 </div>
-
-![footer](https://user-images.githubusercontent.com/10498744/210157572-1fca0242-8af2-46a6-bfa3-666ffd40ebde.svg)

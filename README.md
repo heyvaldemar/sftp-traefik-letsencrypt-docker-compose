@@ -83,6 +83,10 @@ This is deliberately a host-side script and not a container in the stack: an in-
 
 Every service carries memory and CPU limits plus reservations as compose-level defaults — the same values CI boots the stack under. Override any of them in `.env` (the knobs and their defaults are listed in `.env.example`, e.g. `TRAEFIK_MEMORY_LIMIT=512m`) and the override survives every `git pull`. If a service is OOM-killed under real load, `docker inspect <container> --format '{{.State.OOMKilled}}'` says so; raise its `_MEMORY_LIMIT` and recreate.
 
+## Backups
+
+The SFTP service keeps no state of its own: users and keys come from `.env` and the mounted host directories are the data. Back up those host directories with whatever already covers the host (restic, rclone, Borg, S3 sync); there is no database and no volume beyond Traefik's certificates, which are re-issued automatically.
+
 ## Testing
 
 The [Deployment Verification](https://github.com/heyvaldemar/sftp-traefik-letsencrypt-docker-compose/actions/workflows/deployment-verification.yml?query=branch%3Amain) workflow runs on every push, pull request, and every Monday at 06:00 UTC: actionlint, Trivy scans of both pinned images, the weekly digest check, and a deploy-and-test job that performs a real SFTP login and directory listing through Traefik's TCP router with an ephemeral password.

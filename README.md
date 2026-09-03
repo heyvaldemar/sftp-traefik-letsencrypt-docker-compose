@@ -1,4 +1,4 @@
-# SFTP + Traefik + Let's Encrypt — Docker Compose
+# SFTP + Traefik + Let's Encrypt on Docker Compose
 
 [![Deployment Verification](https://github.com/heyvaldemar/sftp-traefik-letsencrypt-docker-compose/actions/workflows/deployment-verification.yml/badge.svg?branch=main)](https://github.com/heyvaldemar/sftp-traefik-letsencrypt-docker-compose/actions/workflows/deployment-verification.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -43,21 +43,21 @@ sftp -P 2222 user1@YOUR_SERVER   # prompts for the password from .env
 ### Common first-deploy issues
 
 - **Connection refused.** The `SFTP_PORT` (default 2222) must be open in your firewall; Traefik publishes it directly.
-- **Login works but uploads fail.** Upload into the `data` subdirectory — the chroot home itself is read-only by design (atmoz/sftp requirement).
+- **Login works but uploads fail.** Upload into the `data` subdirectory: the chroot home itself is read-only by design (atmoz/sftp requirement).
 - **Networks not found.** Step 2 was skipped.
 
 ## Supply chain trust
 
-Two images — [`traefik`](https://hub.docker.com/_/traefik) and [`atmoz/sftp`](https://hub.docker.com/r/atmoz/sftp) — pinned by digest as interpolation defaults in the compose `x-images` block (atmoz/sftp publishes no semver tags, so the `debian` tag is pinned to an exact digest). `git pull` alone delivers the tested combination.
+Two images ([`traefik`](https://hub.docker.com/_/traefik) and [`atmoz/sftp`](https://hub.docker.com/r/atmoz/sftp)) pinned by digest as interpolation defaults in the compose `x-images` block (atmoz/sftp publishes no semver tags, so the `debian` tag is pinned to an exact digest). `git pull` alone delivers the tested combination.
 
 The daily `check-pin-freshness` CI job re-resolves each pin against its registry; GitHub Actions are pinned by commit SHA and Dependabot keeps those fresh.
 
 ## Production checklist
 
-- [ ] **Strong passwords** — 24+ random characters per account; regenerate the Traefik dashboard hash.
-- [ ] **Prefer SSH keys** for real workloads — atmoz/sftp supports mounting public keys per user; password auth is the lowest bar.
-- [ ] **Back up `/srv/sftpusers/`** — that's where all uploaded data lives.
-- [ ] **Watch the upstream image** — atmoz/sftp moves slowly; the weekly digest check tells you when a rebuild lands.
+- [ ] **Strong passwords**: 24+ random characters per account; regenerate the Traefik dashboard hash.
+- [ ] **Prefer SSH keys** for real workloads: atmoz/sftp supports mounting public keys per user; password auth is the lowest bar.
+- [ ] **Back up `/srv/sftpusers/`**: that's where all uploaded data lives.
+- [ ] **Watch the upstream image**: atmoz/sftp moves slowly; the weekly digest check tells you when a rebuild lands.
 
 ## Unattended updates
 
@@ -75,13 +75,13 @@ Put it on a timer for hands-off minor/patch updates:
 17 5 * * *  /opt/sftp-traefik-letsencrypt-docker-compose/update.sh >> /var/log/sftp-update.log 2>&1
 ```
 
-The script refuses to cross a MAJOR template version on its own — majors are breaking by definition and their release notes exist to be read. After reading them, `./update.sh --allow-major` performs the jump. It also refuses to touch a checkout with local modifications: your customization belongs in `.env`, which updates never overwrite.
+The script refuses to cross a MAJOR template version on its own: majors are breaking by definition and their release notes exist to be read. After reading them, `./update.sh --allow-major` performs the jump. It also refuses to touch a checkout with local modifications: your customization belongs in `.env`, which updates never overwrite.
 
 This is deliberately a host-side script and not a container in the stack: an in-stack updater needs the Docker socket (root on the host) and turns "someone pushed to a repo" into "someone deployed to your machine" with no operator in the loop. A cron job under your own user updates only to tagged, CI-verified states and leaves the trust boundary where it was.
 
 ## Resource limits
 
-Every service carries memory and CPU limits plus reservations as compose-level defaults — the same values CI boots the stack under. Override any of them in `.env` (the knobs and their defaults are listed in `.env.example`, e.g. `TRAEFIK_MEMORY_LIMIT=512m`) and the override survives every `git pull`. If a service is OOM-killed under real load, `docker inspect <container> --format '{{.State.OOMKilled}}'` says so; raise its `_MEMORY_LIMIT` and recreate.
+Every service carries memory and CPU limits plus reservations as compose-level defaults, the same values CI boots the stack under. Override any of them in `.env` (the knobs and their defaults are listed in `.env.example`, e.g. `TRAEFIK_MEMORY_LIMIT=512m`) and the override survives every `git pull`. If a service is OOM-killed under real load, `docker inspect <container> --format '{{.State.OOMKilled}}'` says so; raise its `_MEMORY_LIMIT` and recreate.
 
 ## Backups
 
@@ -107,7 +107,7 @@ The [Deployment Verification](https://github.com/heyvaldemar/sftp-traefik-letsen
 
 <div align="center">
 
-**Maintained by [Vladimir Mikhalev](https://github.com/heyvaldemar)** — Docker Captain · IBM Champion · AWS Community Builder
+**Maintained by [Vladimir Mikhalev](https://github.com/heyvaldemar)** · Docker Captain · IBM Champion · AWS Community Builder
 
 [YouTube](https://www.youtube.com/channel/UCf85kQ0u1sYTTTyKVpxrlyQ?sub_confirmation=1) · [Blog](https://heyvaldemar.com) · [LinkedIn](https://www.linkedin.com/in/heyvaldemar/)
 

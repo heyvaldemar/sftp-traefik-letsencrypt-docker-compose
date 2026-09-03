@@ -41,7 +41,7 @@ _(no unreleased changes yet)_
 
 ### Added
 
-- **`update.sh`** — unattended updates to the newest tagged release,
+- **`update.sh`**: unattended updates to the newest tagged release,
   and nothing else: a tag is cut only after CI has booted the pinned
   images and passed the smoke tests, so "update to the latest tag" means
   "update to a combination a machine has already run". It refuses to
@@ -64,13 +64,13 @@ v1.2.0.
 ### Fixed
 
 - **Host data paths follow the account names**: the bind mounts were
-  hardcoded to `user1`/`user2` while the usernames were variables —
+  hardcoded to `user1`/`user2` while the usernames were variables:
   renaming an account silently mounted the wrong home directory.
 
 ### Security
 
 - **Credentials untracked from git.** The tracked `.env` carried
-  generated-looking passwords for both accounts — rotate them if
+  generated-looking passwords for both accounts. Rotate them if
   reused.
 
 ### Added

@@ -3,7 +3,7 @@
 [![Deployment Verification](https://github.com/heyvaldemar/sftp-traefik-letsencrypt-docker-compose/actions/workflows/deployment-verification.yml/badge.svg?branch=main)](https://github.com/heyvaldemar/sftp-traefik-letsencrypt-docker-compose/actions/workflows/deployment-verification.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-This repository deploys an **SFTP server** ([atmoz/sftp](https://github.com/atmoz/sftp)) behind **Traefik's TCP router**, with the Traefik dashboard on HTTPS via **Let's Encrypt**. Two chrooted accounts are provisioned from `.env`; their data lands on the host under `/srv/sftpusers/<user>`.
+This repository deploys an SFTP server ([atmoz/sftp](https://github.com/atmoz/sftp)) behind Traefik's TCP router, with the Traefik dashboard on HTTPS via Let's Encrypt. Two chrooted accounts are provisioned from `.env`; their data lands on the host under `/srv/sftpusers/<user>`.
 
 ## Getting started
 
@@ -97,7 +97,7 @@ Every service runs with `security_opt: no-new-privileges:true`, so a process can
 
 The [Deployment Verification](https://github.com/heyvaldemar/sftp-traefik-letsencrypt-docker-compose/actions/workflows/deployment-verification.yml?query=branch%3Amain) workflow runs on every push, pull request, and every day at 06:00 UTC: actionlint, Trivy scans of both pinned images, the weekly digest check, and a deploy-and-test job that performs a real SFTP login and directory listing through Traefik's TCP router with an ephemeral password.
 
-## Security Notes
+## Security notes
 
 - Credentials are read from `.env` at deploy time; `.env` is gitignored and compose fails fast on missing required variables.
 - **Pre-rotation advisory.** Releases before v1.0.0 (2026-09-01) shipped a tracked `.env` with generated-looking account passwords. Rotate them if your deployment reused them.

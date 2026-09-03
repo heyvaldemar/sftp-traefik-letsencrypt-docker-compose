@@ -50,7 +50,7 @@ sftp -P 2222 user1@YOUR_SERVER   # prompts for the password from .env
 
 Two images — [`traefik`](https://hub.docker.com/_/traefik) and [`atmoz/sftp`](https://hub.docker.com/r/atmoz/sftp) — pinned by digest as interpolation defaults in the compose `x-images` block (atmoz/sftp publishes no semver tags, so the `debian` tag is pinned to an exact digest). `git pull` alone delivers the tested combination.
 
-The weekly `check-pin-freshness` CI job re-resolves each pin against its registry; GitHub Actions are pinned by commit SHA and Dependabot keeps those fresh.
+The daily `check-pin-freshness` CI job re-resolves each pin against its registry; GitHub Actions are pinned by commit SHA and Dependabot keeps those fresh.
 
 ## Production checklist
 
@@ -89,7 +89,7 @@ The SFTP service keeps no state of its own: users and keys come from `.env` and 
 
 ## Testing
 
-The [Deployment Verification](https://github.com/heyvaldemar/sftp-traefik-letsencrypt-docker-compose/actions/workflows/deployment-verification.yml?query=branch%3Amain) workflow runs on every push, pull request, and every Monday at 06:00 UTC: actionlint, Trivy scans of both pinned images, the weekly digest check, and a deploy-and-test job that performs a real SFTP login and directory listing through Traefik's TCP router with an ephemeral password.
+The [Deployment Verification](https://github.com/heyvaldemar/sftp-traefik-letsencrypt-docker-compose/actions/workflows/deployment-verification.yml?query=branch%3Amain) workflow runs on every push, pull request, and every day at 06:00 UTC: actionlint, Trivy scans of both pinned images, the weekly digest check, and a deploy-and-test job that performs a real SFTP login and directory listing through Traefik's TCP router with an ephemeral password.
 
 ## Security Notes
 

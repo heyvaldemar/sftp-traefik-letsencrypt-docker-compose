@@ -1,6 +1,7 @@
 # SFTP + Traefik + Let's Encrypt on Docker Compose
 
 [![Deployment Verification](https://github.com/heyvaldemar/sftp-traefik-letsencrypt-docker-compose/actions/workflows/deployment-verification.yml/badge.svg?branch=main)](https://github.com/heyvaldemar/sftp-traefik-letsencrypt-docker-compose/actions/workflows/deployment-verification.yml)
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/14843/badge)](https://www.bestpractices.dev/projects/14843)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 This repository deploys an SFTP server ([atmoz/sftp](https://github.com/atmoz/sftp)) behind Traefik's TCP router, with the Traefik dashboard on HTTPS via Let's Encrypt. Two chrooted accounts are provisioned from `.env`; their data lands on the host under `/srv/sftpusers/<user>`.

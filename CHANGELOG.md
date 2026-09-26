@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+_(no unreleased changes yet)_
+
+## [1.4.5] - 2026-09-26
+
 ### Security
 
 - **`atmoz/sftp:debian` was rebuilt upstream**; the pin moved from `sha256:2b7fa66f4aa7…` to `sha256:75dcc29683ad…`. Same version, same tag, a rebuilt base image — the usual shape of a security fix in a base layer.
@@ -118,7 +122,8 @@ v1.2.0.
   that performs a real SFTP login and directory listing through
   Traefik's TCP router.
 
-[Unreleased]: https://github.com/heyvaldemar/sftp-traefik-letsencrypt-docker-compose/compare/v1.4.4...HEAD
+[Unreleased]: https://github.com/heyvaldemar/sftp-traefik-letsencrypt-docker-compose/compare/v1.4.5...HEAD
+[1.4.5]: https://github.com/heyvaldemar/sftp-traefik-letsencrypt-docker-compose/compare/v1.4.4...v1.4.5
 [1.4.4]: https://github.com/heyvaldemar/sftp-traefik-letsencrypt-docker-compose/compare/v1.4.3...v1.4.4
 [1.4.3]: https://github.com/heyvaldemar/sftp-traefik-letsencrypt-docker-compose/compare/v1.4.2...v1.4.3
 [1.4.2]: https://github.com/heyvaldemar/sftp-traefik-letsencrypt-docker-compose/compare/v1.4.1...v1.4.2

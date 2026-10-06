@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+_(no unreleased changes yet)_
+
+## [1.5.1] - 2026-10-06
+
 ### Fixed
 
 - **`update.sh` no longer stops without a word when a release adds a variable and no compose file requires one.** The search for `${VAR:?}` came back empty, and under `pipefail` that empty result ended the script with status 1 right after it listed the new variables.
@@ -141,7 +145,8 @@ v1.2.0.
   that performs a real SFTP login and directory listing through
   Traefik's TCP router.
 
-[Unreleased]: https://github.com/heyvaldemar/sftp-traefik-letsencrypt-docker-compose/compare/v1.5.0...HEAD
+[Unreleased]: https://github.com/heyvaldemar/sftp-traefik-letsencrypt-docker-compose/compare/v1.5.1...HEAD
+[1.5.1]: https://github.com/heyvaldemar/sftp-traefik-letsencrypt-docker-compose/compare/v1.5.0...v1.5.1
 [1.5.0]: https://github.com/heyvaldemar/sftp-traefik-letsencrypt-docker-compose/compare/v1.4.5...v1.5.0
 [1.4.5]: https://github.com/heyvaldemar/sftp-traefik-letsencrypt-docker-compose/compare/v1.4.4...v1.4.5
 [1.4.4]: https://github.com/heyvaldemar/sftp-traefik-letsencrypt-docker-compose/compare/v1.4.3...v1.4.4

@@ -6,8 +6,8 @@
 # CI (Trivy scans, check-pin-freshness, the ephemeral test .env) reads
 # the pins from these lines — this block is the single source of truth.
 x-images:
-  traefik: &traefik-image ${TRAEFIK_IMAGE_TAG:-traefik:${TRAEFIK_IMAGE_VERSION:-3.7@sha256:24841fe2de7304c149343d877d2923b4c8800a38ba015dea9174c23b20e344a0}}
-  sftp: &sftp-image ${SFTP_IMAGE_TAG:-atmoz/sftp:${SFTP_IMAGE_VERSION:-debian@sha256:77bbedb7f120c07630c4181346dd5dc28fc22db53d8f847b0cf9c710a22a6113}}
+  traefik: &traefik-image ${TRAEFIK_IMAGE_TAG:-traefik:${TRAEFIK_IMAGE_VERSION:-3.7@sha256:b588cb566045e1ebb185948a8e2456f9705cb915b5f0fb5ee698184233997817}}
+  sftp: &sftp-image ${SFTP_IMAGE_TAG:-atmoz/sftp:${SFTP_IMAGE_VERSION:-debian@sha256:f308cffe27242286d1e93a548dc5a581223b963e9b044d9e452594ef30dd05bd}}
 
 networks:
   sftp-network:

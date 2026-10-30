@@ -7,7 +7,7 @@
 # the pins from these lines — this block is the single source of truth.
 x-images:
   traefik: &traefik-image ${TRAEFIK_IMAGE_TAG:-traefik:${TRAEFIK_IMAGE_VERSION:-3.7@sha256:1336e85aaed293bd63d005086e0dd013b04078b26aaeb1c18b26a2f928af7e65}}
-  sftp: &sftp-image ${SFTP_IMAGE_TAG:-atmoz/sftp:${SFTP_IMAGE_VERSION:-debian@sha256:9a561c7779ba254bc218c56be2525e626f6ab29f3dd46a20b5d51a5586189bc1}}
+  sftp: &sftp-image ${SFTP_IMAGE_TAG:-atmoz/sftp:${SFTP_IMAGE_VERSION:-debian@sha256:9f233cde678d62a7b2e0fa9f3f20bf401885b1203b2dffc50695f51813ebfb87}}
 
 networks:
   sftp-network:

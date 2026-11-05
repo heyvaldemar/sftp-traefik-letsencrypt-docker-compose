@@ -7,7 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-_(no unreleased changes yet)_
+### Security
+
+- **`atmoz/sftp:debian` was rebuilt upstream**; the pin moved from `sha256:9f233cde678d…` to `sha256:54efe2a6cda2…`. Same version, same tag, a rebuilt base image — the usual shape of a security fix in a base layer.
 
 ## [1.5.12] - 2026-11-04
 

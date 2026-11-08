@@ -34,9 +34,15 @@ services:
         reservations:
           memory: ${SFTP_MEMORY_RESERVATION:-64m}
           cpus: "${SFTP_CPU_RESERVATION:-0.25}"
-    command:  |
-      ${SFTP_USER_1:-user1}:${SFTP_USER_1_PASSWORD:?set in .env - see .env.example for generation command}:${SFTP_USER_1_UID:-1001}::
-      ${SFTP_USER_2:-user2}:${SFTP_USER_2_PASSWORD:?set in .env - see .env.example for generation command}:${SFTP_USER_2_UID:-1002}::
+    # THE USERS GO IN THE ENVIRONMENT, NOT ON THE COMMAND LINE. As command
+    # arguments, user:password:uid sat in the entrypoint's arguments while it
+    # created the users and generated the host keys, where every user on the
+    # host reads them with ps, and in the container's recorded command. The
+    # image reads the same list, space-separated, from SFTP_USERS.
+    environment:
+      SFTP_USERS: >-
+        ${SFTP_USER_1:-user1}:${SFTP_USER_1_PASSWORD:?set in .env - see .env.example for generation command}:${SFTP_USER_1_UID:-1001}::
+        ${SFTP_USER_2:-user2}:${SFTP_USER_2_PASSWORD:?set in .env - see .env.example for generation command}:${SFTP_USER_2_UID:-1002}::
     volumes:
       - /srv/sftpusers/${SFTP_USER_1:-user1}:/home/${SFTP_USER_1:-user1}/data
       - /srv/sftpusers/${SFTP_USER_2:-user2}:/home/${SFTP_USER_2:-user2}/data

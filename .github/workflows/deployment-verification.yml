@@ -229,10 +229,28 @@ jobs:
             echo "Waiting for the SFTP entrypoint..."
             sleep 5
           done'
-          echo "ls" | sshpass -p "$SFTP_CI_PASSWORD" sftp -P 2222 \
+          # sshpass -e reads SSHPASS from the environment: -p would put the
+          # password on sshpass's command line.
+          echo "ls" | SSHPASS="$SFTP_CI_PASSWORD" sshpass -e sftp -P 2222 \
             -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
             "user1@$APP_HOSTNAME"
           echo "SFTP login and listing succeeded"
+
+      - name: No SFTP password on a command line, nor in the recorded command
+        # The users were command arguments: in the entrypoint's arguments while
+        # it set them up, and in the container's recorded command for good.
+        # They come from SFTP_USERS now. Compared through a file, never printed.
+        run: |
+          vals="$(mktemp)"; chmod 600 "$vals"
+          sed -n -E 's/^SFTP_USER_[12]_PASSWORD=//p' .env > "$vals"
+          [ "$(grep -c . "$vals")" = 2 ] || { echo "::error::could not read both passwords from .env"; exit 1; }
+          cid="$(docker compose -f "$DOCKER_COMPOSE_FILE" -p "$COMPOSE_PROJECT_NAME" ps -q sftp)"
+          recorded=$(docker inspect -f '{{json .Config.Cmd}} {{json .Args}} {{json .Path}}' "$cid" | grep -cF -f "$vals" || true)
+          # shellcheck disable=SC2009  # every command line on the runner, not one process
+          host=$(ps -eo args= | grep -cF -f "$vals" || true)
+          rm -f "$vals"
+          echo "carrying a password: recorded command $recorded, command lines on the runner $host"
+          [ "$recorded" = 0 ] && [ "$host" = 0 ] || { echo "::error::an SFTP password is on a command line"; exit 1; }
 
       - name: Wait for the Traefik dashboard to be ready
         run: |

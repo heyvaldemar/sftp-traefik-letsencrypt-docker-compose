@@ -7,7 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-_(no unreleased changes yet)_
+### Security
+
+- **The SFTP passwords are no longer on a command line.** The two users were the container's command, `user:password:uid::`, so both passwords sat in the entrypoint's arguments while it created the users and generated the host keys, where every user on the host reads them with `ps`, and in the container's recorded command for as long as it existed. The compose file now hands the same list to the image through `SFTP_USERS`, which it reads the same way. CI logs in with `sshpass -e` (the password from the environment, not `-p`) and checks that neither password is in the container's recorded command or on any command line on the runner.
 
 ## [1.5.15] - 2026-11-06
 
